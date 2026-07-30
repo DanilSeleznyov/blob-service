@@ -7,6 +7,6 @@
 *.out
 .env
 .env.local
-.dockerignore
 .vscode/
 Thumbs.db
+proto/generate.go
