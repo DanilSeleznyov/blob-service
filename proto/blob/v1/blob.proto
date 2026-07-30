@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package blob.v1;
+
+option go_package = "blob-service/gen/blob/v1;pb";
+
