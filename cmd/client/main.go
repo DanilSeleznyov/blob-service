@@ -17,14 +17,14 @@ import (
 
 func printUsage() {
 	fmt.Printf(`
-		blob-service client\n
-		usage: client <command> [flags]\n
+		blob-service client
+		usage: client <command> [flags]
 		commands:
 		  create   upload a file as a new blob
 		  get      download a blob by id
 		  list     list blobs with filters
 		  update   replace a blob (full replace)
-		  delete   remove a blob by id\n
+		  delete   remove a blob by id
 		examples:
 		  client create --file photo.jpg --tags demo,vacation
 		  client get --id <uuid> --out downloaded.jpg
@@ -81,6 +81,7 @@ func runGet(client pb.BlobServiceClient, args []string) {
 	fs := flag.NewFlagSet("get", flag.ExitOnError)
 
 	id := fs.String("id", "", "unique blob index")
+	out := fs.String("out", "", "path to save the blob to (optional)")
 
 	fs.Parse(args)
 
@@ -97,7 +98,18 @@ func runGet(client pb.BlobServiceClient, args []string) {
 		return
 	}
 
-	fmt.Printf(resp.Blob.Id)
+	blob := resp.Blob
+
+	if *out != "" {
+		if err := os.WriteFile(*out, blob.Data, 0644); err != nil {
+			fmt.Fprintln(os.Stderr, "failed to write file:", err)
+			return
+		}
+		fmt.Printf("saved %d bytes to %s\n", blob.Size, *out)
+	} else {
+		fmt.Printf("name=%s size=%d md5=%s tags=%v\n", blob.Name, blob.Size, blob.Md5Hash, blob.Tags)
+	}
+
 }
 
 func runUpdate(client pb.BlobServiceClient, args []string) {
@@ -113,8 +125,6 @@ func runUpdate(client pb.BlobServiceClient, args []string) {
 		fs.Usage()
 		return
 	}
-
-	fs.Parse(args)
 
 	var tagList []string
 	if *tags != "" {
@@ -168,7 +178,7 @@ func runDelete(client pb.BlobServiceClient, args []string) {
 		return
 	}
 
-	fmt.Printf(resp.Blob.Id)
+	fmt.Println(resp.Blob.Id)
 }
 
 func runList(client pb.BlobServiceClient, args []string) {
@@ -212,6 +222,7 @@ func runList(client pb.BlobServiceClient, args []string) {
 func main() {
 	if len(os.Args) < 2 {
 		printUsage()
+		return
 	}
 	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
