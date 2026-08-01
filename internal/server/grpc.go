@@ -4,6 +4,8 @@ import (
 	pb "blob-service/gen/blob/v1"
 	"blob-service/internal/storage"
 	"context"
+	"database/sql"
+	"errors"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -45,13 +47,14 @@ func (s *BlobServer) GetBlob(ctx context.Context, req *pb.GetBlobRequest) (*pb.G
 }
 
 func (s *BlobServer) UpdateBlob(ctx context.Context, req *pb.UpdateBlobRequest) (*pb.UpdateBlobResponse, error) {
-	if req.Id == "" || req.Name == "" || req.Data == nil || req.ContentType == "" ||
-		req.Category == "" || req.AccessLevel == "" {
+	if req.Id == "" || req.Name == "" || req.Data == nil || req.ContentType == "" {
 		return nil, status.Error(codes.InvalidArgument, "id, name, data, content_type, category and access_level are required")
 	}
 
 	blob, err := s.repo.Update(ctx, req)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, status.Errorf(codes.NotFound, "blob not found")
+	} else if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update blob: %v", err)
 	}
 

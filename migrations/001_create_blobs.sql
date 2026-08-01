@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS blobs (
     data BYTEA NOT NULL,
     size BIGINT NOT NULL, 
     md5_hash VARCHAR(255) NOT NULL,
-    sha256_hash VARCHAR(300),
+    sha256_hash VARCHAR(300) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     category VARCHAR(100),

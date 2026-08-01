@@ -112,12 +112,31 @@ func (r *BlobRepository) Get(ctx context.Context, req *pb.GetBlobRequest) (*pb.B
 }
 
 func (r *BlobRepository) Update(ctx context.Context, req *pb.UpdateBlobRequest) (*pb.Blob, error) {
-	query := `UPDATE blobs SET name = $1, content_type = $2, data = $3, category = $4, tags = $5, metadata = $6, access_level = $7 WHERE id = $8 RETURNING *`
+	query := `
+		UPDATE blobs 
+		SET name = $1, 
+			content_type = $2, 
+			extension = $3,
+			data = $4, 
+			size = $5,
+			md5_hash = $6,
+			sha256_hash = $7,
+			updated_at = NOW(),
+			category = $8, 
+			tags = $9, 
+			metadata = $10, 
+			access_level = $11
+		WHERE id = $12 
+		RETURNING *`
+
+	ext := filepath.Ext(req.Name)
+	md5Hash := fmt.Sprintf("%x", md5.Sum(req.Data))
+	sha256Hash := fmt.Sprintf("%x", sha256.Sum256(req.Data))
 
 	var blob pb.Blob
 	var createdAt, updatedAt time.Time
-	var extension, md5Val string
-	var sha256Null, categoryNull, ownerIdNull, accessLevelNull sql.NullString
+	var extension, md5Val, sha256Val string
+	var categoryNull, ownerIdNull, accessLevelNull sql.NullString
 	var metadata []byte
 
 	var metadataJSON []byte
@@ -130,14 +149,14 @@ func (r *BlobRepository) Update(ctx context.Context, req *pb.UpdateBlobRequest) 
 	}
 
 	row := r.db.QueryRowContext(ctx, query,
-		req.Name, req.ContentType, req.Data, req.Category,
-		pq.Array(req.Tags), metadataJSON, req.AccessLevel,
-		req.Id,
+		req.Name, req.ContentType, ext, req.Data, len(req.Data),
+		md5Hash, sha256Hash, req.Category, pq.Array(req.Tags), metadataJSON,
+		req.AccessLevel, req.Id,
 	)
 	err := row.Scan(
 		&blob.Id, &blob.Name, &blob.ContentType,
 		&extension, &blob.Data, &blob.Size,
-		&md5Val, &sha256Null,
+		&md5Val, &sha256Val,
 		&createdAt, &updatedAt,
 		&categoryNull, pq.Array(&blob.Tags), &metadata,
 		&ownerIdNull, &accessLevelNull,
@@ -153,7 +172,7 @@ func (r *BlobRepository) Update(ctx context.Context, req *pb.UpdateBlobRequest) 
 
 	blob.Extension = extension
 	blob.Md5Hash = md5Val
-	blob.Sha256Hash = sha256Null.String
+	blob.Sha256Hash = sha256Val
 	blob.Category = categoryNull.String
 	blob.OwnerId = ownerIdNull.String
 	blob.AccessLevel = accessLevelNull.String
