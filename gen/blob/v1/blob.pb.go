@@ -385,6 +385,9 @@ type UpdateBlobRequest struct {
 	ContentType   string                 `protobuf:"bytes,3,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	Data          []byte                 `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	Tags          []string               `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
+	Category      string                 `protobuf:"bytes,6,opt,name=category,proto3" json:"category,omitempty"`
+	Metadata      map[string]string      `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	AccessLevel   string                 `protobuf:"bytes,8,opt,name=access_level,json=accessLevel,proto3" json:"access_level,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -452,6 +455,27 @@ func (x *UpdateBlobRequest) GetTags() []string {
 		return x.Tags
 	}
 	return nil
+}
+
+func (x *UpdateBlobRequest) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *UpdateBlobRequest) GetMetadata() map[string]string {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *UpdateBlobRequest) GetAccessLevel() string {
+	if x != nil {
+		return x.AccessLevel
+	}
+	return ""
 }
 
 type UpdateBlobResponse struct {
@@ -736,13 +760,19 @@ const file_blob_v1_blob_proto_rawDesc = "" +
 	"\x0eGetBlobRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"4\n" +
 	"\x0fGetBlobResponse\x12!\n" +
-	"\x04blob\x18\x01 \x01(\v2\r.blob.v1.BlobR\x04blob\"\x82\x01\n" +
+	"\x04blob\x18\x01 \x01(\v2\r.blob.v1.BlobR\x04blob\"\xc4\x02\n" +
 	"\x11UpdateBlobRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
 	"\fcontent_type\x18\x03 \x01(\tR\vcontentType\x12\x12\n" +
 	"\x04data\x18\x04 \x01(\fR\x04data\x12\x12\n" +
-	"\x04tags\x18\x05 \x03(\tR\x04tags\"7\n" +
+	"\x04tags\x18\x05 \x03(\tR\x04tags\x12\x1a\n" +
+	"\bcategory\x18\x06 \x01(\tR\bcategory\x12D\n" +
+	"\bmetadata\x18\a \x03(\v2(.blob.v1.UpdateBlobRequest.MetadataEntryR\bmetadata\x12!\n" +
+	"\faccess_level\x18\b \x01(\tR\vaccessLevel\x1a;\n" +
+	"\rMetadataEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"7\n" +
 	"\x12UpdateBlobResponse\x12!\n" +
 	"\x04blob\x18\x01 \x01(\v2\r.blob.v1.BlobR\x04blob\"#\n" +
 	"\x11DeleteBlobRequest\x12\x0e\n" +
@@ -780,7 +810,7 @@ func file_blob_v1_blob_proto_rawDescGZIP() []byte {
 	return file_blob_v1_blob_proto_rawDescData
 }
 
-var file_blob_v1_blob_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_blob_v1_blob_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_blob_v1_blob_proto_goTypes = []any{
 	(*Blob)(nil),                  // 0: blob.v1.Blob
 	(*CreateBlobRequest)(nil),     // 1: blob.v1.CreateBlobRequest
@@ -794,32 +824,34 @@ var file_blob_v1_blob_proto_goTypes = []any{
 	(*ListBlobsRequest)(nil),      // 9: blob.v1.ListBlobsRequest
 	(*ListBlobsResponse)(nil),     // 10: blob.v1.ListBlobsResponse
 	nil,                           // 11: blob.v1.Blob.MetadataEntry
-	(*timestamppb.Timestamp)(nil), // 12: google.protobuf.Timestamp
+	nil,                           // 12: blob.v1.UpdateBlobRequest.MetadataEntry
+	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
 }
 var file_blob_v1_blob_proto_depIdxs = []int32{
-	12, // 0: blob.v1.Blob.created_at:type_name -> google.protobuf.Timestamp
-	12, // 1: blob.v1.Blob.updated_at:type_name -> google.protobuf.Timestamp
+	13, // 0: blob.v1.Blob.created_at:type_name -> google.protobuf.Timestamp
+	13, // 1: blob.v1.Blob.updated_at:type_name -> google.protobuf.Timestamp
 	11, // 2: blob.v1.Blob.metadata:type_name -> blob.v1.Blob.MetadataEntry
 	0,  // 3: blob.v1.CreateBlobResponse.blob:type_name -> blob.v1.Blob
 	0,  // 4: blob.v1.GetBlobResponse.blob:type_name -> blob.v1.Blob
-	0,  // 5: blob.v1.UpdateBlobResponse.blob:type_name -> blob.v1.Blob
-	0,  // 6: blob.v1.DeleteBlobResponse.blob:type_name -> blob.v1.Blob
-	0,  // 7: blob.v1.ListBlobsResponse.blobs:type_name -> blob.v1.Blob
-	1,  // 8: blob.v1.BlobService.CreateBlob:input_type -> blob.v1.CreateBlobRequest
-	3,  // 9: blob.v1.BlobService.GetBlob:input_type -> blob.v1.GetBlobRequest
-	5,  // 10: blob.v1.BlobService.UpdateBlob:input_type -> blob.v1.UpdateBlobRequest
-	7,  // 11: blob.v1.BlobService.DeleteBlob:input_type -> blob.v1.DeleteBlobRequest
-	9,  // 12: blob.v1.BlobService.ListBlobs:input_type -> blob.v1.ListBlobsRequest
-	2,  // 13: blob.v1.BlobService.CreateBlob:output_type -> blob.v1.CreateBlobResponse
-	4,  // 14: blob.v1.BlobService.GetBlob:output_type -> blob.v1.GetBlobResponse
-	6,  // 15: blob.v1.BlobService.UpdateBlob:output_type -> blob.v1.UpdateBlobResponse
-	8,  // 16: blob.v1.BlobService.DeleteBlob:output_type -> blob.v1.DeleteBlobResponse
-	10, // 17: blob.v1.BlobService.ListBlobs:output_type -> blob.v1.ListBlobsResponse
-	13, // [13:18] is the sub-list for method output_type
-	8,  // [8:13] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	12, // 5: blob.v1.UpdateBlobRequest.metadata:type_name -> blob.v1.UpdateBlobRequest.MetadataEntry
+	0,  // 6: blob.v1.UpdateBlobResponse.blob:type_name -> blob.v1.Blob
+	0,  // 7: blob.v1.DeleteBlobResponse.blob:type_name -> blob.v1.Blob
+	0,  // 8: blob.v1.ListBlobsResponse.blobs:type_name -> blob.v1.Blob
+	1,  // 9: blob.v1.BlobService.CreateBlob:input_type -> blob.v1.CreateBlobRequest
+	3,  // 10: blob.v1.BlobService.GetBlob:input_type -> blob.v1.GetBlobRequest
+	5,  // 11: blob.v1.BlobService.UpdateBlob:input_type -> blob.v1.UpdateBlobRequest
+	7,  // 12: blob.v1.BlobService.DeleteBlob:input_type -> blob.v1.DeleteBlobRequest
+	9,  // 13: blob.v1.BlobService.ListBlobs:input_type -> blob.v1.ListBlobsRequest
+	2,  // 14: blob.v1.BlobService.CreateBlob:output_type -> blob.v1.CreateBlobResponse
+	4,  // 15: blob.v1.BlobService.GetBlob:output_type -> blob.v1.GetBlobResponse
+	6,  // 16: blob.v1.BlobService.UpdateBlob:output_type -> blob.v1.UpdateBlobResponse
+	8,  // 17: blob.v1.BlobService.DeleteBlob:output_type -> blob.v1.DeleteBlobResponse
+	10, // 18: blob.v1.BlobService.ListBlobs:output_type -> blob.v1.ListBlobsResponse
+	14, // [14:19] is the sub-list for method output_type
+	9,  // [9:14] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_blob_v1_blob_proto_init() }
@@ -833,7 +865,7 @@ func file_blob_v1_blob_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_blob_v1_blob_proto_rawDesc), len(file_blob_v1_blob_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
