@@ -48,7 +48,7 @@ func (s *BlobServer) GetBlob(ctx context.Context, req *pb.GetBlobRequest) (*pb.G
 
 func (s *BlobServer) UpdateBlob(ctx context.Context, req *pb.UpdateBlobRequest) (*pb.UpdateBlobResponse, error) {
 	if req.Id == "" || req.Name == "" || req.Data == nil || req.ContentType == "" {
-		return nil, status.Error(codes.InvalidArgument, "id, name, data, content_type, category and access_level are required")
+		return nil, status.Error(codes.InvalidArgument, "id, name, data, content_type are required")
 	}
 
 	blob, err := s.repo.Update(ctx, req)
