@@ -39,7 +39,9 @@ func (s *BlobServer) GetBlob(ctx context.Context, req *pb.GetBlobRequest) (*pb.G
 	}
 
 	blob, err := s.repo.Get(ctx, req)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, status.Errorf(codes.NotFound, "blob not found")
+	} else if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get blob: %v", err)
 	}
 
@@ -67,7 +69,9 @@ func (s *BlobServer) DeleteBlob(ctx context.Context, req *pb.DeleteBlobRequest) 
 	}
 
 	blob, err := s.repo.Delete(ctx, req)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, status.Errorf(codes.NotFound, "blob not found")
+	} else if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to delete blob: %v", err)
 	}
 
