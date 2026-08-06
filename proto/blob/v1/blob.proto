@@ -2,5 +2,85 @@ syntax = "proto3";
 
 package blob.v1;
 
+import "google/protobuf/timestamp.proto"; 
+
 option go_package = "blob-service/gen/blob/v1;pb";
 
+message Blob {
+    string id = 1;
+    string name = 2;
+    string content_type = 3;
+    string extension = 4;
+    bytes data = 5;
+    int64 size = 6;
+    string md5_hash = 7;
+    string sha256_hash = 8;
+    google.protobuf.Timestamp created_at = 9;
+    google.protobuf.Timestamp updated_at = 10;
+    string category = 11;
+    repeated string tags = 12;
+    map<string, string> metadata = 13;
+    string owner_id = 14;
+    string access_level = 15;
+}
+
+message CreateBlobRequest {
+    string name = 1;
+    string content_type = 2;
+    bytes data = 3;
+    repeated string tags = 4;
+}
+
+message CreateBlobResponse {
+    Blob blob = 1;
+}
+
+message GetBlobRequest {
+    string id = 1;
+}
+
+message GetBlobResponse {
+    Blob blob = 1;
+}
+
+message UpdateBlobRequest {
+    string id = 1;
+    string name = 2;
+    string content_type = 3;
+    bytes data = 4;
+    repeated string tags = 5;
+    string category = 6;
+    map<string, string> metadata = 7;
+    string access_level = 8;
+}
+
+message UpdateBlobResponse {
+    Blob blob = 1;
+}
+
+message DeleteBlobRequest {
+    string id = 1;
+}
+
+message DeleteBlobResponse {
+    Blob blob = 1;
+}
+
+message ListBlobsRequest {
+    string name_filter = 1;
+    string content_type_filter = 2;
+    repeated string tag_filters = 3;
+    int32 limit = 4;
+}
+
+message ListBlobsResponse {
+    repeated Blob blobs = 1;
+}
+
+service BlobService {
+    rpc CreateBlob(CreateBlobRequest) returns (CreateBlobResponse);
+    rpc GetBlob(GetBlobRequest) returns (GetBlobResponse);
+    rpc UpdateBlob(UpdateBlobRequest) returns (UpdateBlobResponse);
+    rpc DeleteBlob(DeleteBlobRequest) returns (DeleteBlobResponse);
+    rpc ListBlobs(ListBlobsRequest) returns (ListBlobsResponse);
+}

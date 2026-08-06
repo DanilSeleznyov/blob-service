@@ -7,7 +7,6 @@
 *.out
 .env
 .env.local
-.dockerignore
 .vscode/
-.DS_Store
 Thumbs.db
+proto/generate.go
